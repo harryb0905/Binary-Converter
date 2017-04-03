@@ -15,8 +15,15 @@ public class Converter implements ActionListener
     private JPanel mainPanel;
     private JPanel topPanel;
     private JPanel centerPanel;
+    private JPanel wrapperPanel;
     private JPanel actionPanel;
+    
     private JLabel titleLbl;
+    private JLabel enterBinaryLbl;
+    private JTextField binaryEntry;
+    private JButton convertBtn;
+    
+    private static final Font binaryFont = new Font("Courier New", Font.BOLD, 30);
     
     // constants
     private static final int SCREEN_WIDTH = 400;
@@ -32,17 +39,40 @@ public class Converter implements ActionListener
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         topPanel = new JPanel();
-        centerPanel = new JPanel(new GridLayout(1,2));
+        centerPanel = new JPanel(new GridLayout(3,5));
+        wrapperPanel = new JPanel(new FlowLayout(10,0,FlowLayout.LEADING));
         actionPanel = new JPanel();
-        
-        // create components to display
-        titleLbl = new JLabel("Binary Converter");
         
         // add components to panels
         mainPanel.add("North", topPanel);
         mainPanel.add("Center", centerPanel);
         mainPanel.add("South", actionPanel);
+        
+        // create components to display
+        titleLbl = new JLabel("Binary Converter");
+        convertBtn = new JButton("Convert");
+        convertBtn.addActionListener(this);
+        enterBinaryLbl = new JLabel("Enter Binary:");
+
+        binaryEntry = new JTextField();
+        binaryEntry.addKeyListener(new KeyAdapter()
+        {
+            public void keyTyped(KeyEvent e)
+            {
+                if (binaryEntry.getText().length() >= 8) // limit textfield to 3 characters
+                    e.consume();
+            }  
+        });
+        
+        binaryEntry.setPreferredSize(new Dimension(170,50));
+        binaryEntry.setFont(binaryFont);
+        
         topPanel.add(titleLbl);
+        actionPanel.add(convertBtn);
+        
+        wrapperPanel.add(enterBinaryLbl);
+        wrapperPanel.add(binaryEntry);
+        centerPanel.add(wrapperPanel);
         
         // further window details
         window.setContentPane(mainPanel);
@@ -61,7 +91,10 @@ public class Converter implements ActionListener
      */
     public void actionPerformed(ActionEvent e)
     {
-        
+        if (e.getSource() == convertBtn)
+        {
+            System.out.println(binaryEntry.getText());
+        }
     }
     
     /**
