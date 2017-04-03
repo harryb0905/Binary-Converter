@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * A class to allow simple binary conversions to various representations such as hexadecimal, octal and IEEE 754 standard.
+ * A class to allow simple binary conversions to various representations such as denary, octal, hexadecimal and IEEE 754 standard.
  * To use in command line: > java Converter
  *
  * @author Yash Sandu & Harry Baines
@@ -25,8 +25,8 @@ public class Converter implements ActionListener
     
     private static final Font binaryFont = new Font("Courier New", Font.BOLD, 30);
     
-    private int posToCheck = 0;
-    private double power = 0;
+    // variables
+    private int powerValue = 0;
     private int runningTotal = 0;
     
     // constants
@@ -47,7 +47,7 @@ public class Converter implements ActionListener
         wrapperPanel = new JPanel(new FlowLayout(10,0,FlowLayout.LEADING));
         actionPanel = new JPanel();
         
-        // add components to panels
+        // add sub-panels to main panel
         mainPanel.add("North", topPanel);
         mainPanel.add("Center", centerPanel);
         mainPanel.add("South", actionPanel);
@@ -58,22 +58,22 @@ public class Converter implements ActionListener
         convertBtn.addActionListener(this);
         enterBinaryLbl = new JLabel("Enter Binary:");
 
+        // entry field
         binaryEntry = new JTextField();
+        binaryEntry.setPreferredSize(new Dimension(170,50));
+        binaryEntry.setFont(binaryFont);
         binaryEntry.addKeyListener(new KeyAdapter()
         {
             public void keyTyped(KeyEvent e)
             {
-                if (binaryEntry.getText().length() >= 8) // limit textfield to 3 characters
+                if (binaryEntry.getText().length() >= 8) // limit textfield to 8 characters
                     e.consume();
             }  
         });
         
-        binaryEntry.setPreferredSize(new Dimension(170,50));
-        binaryEntry.setFont(binaryFont);
-        
+        // add components to panels
         topPanel.add(titleLbl);
         actionPanel.add(convertBtn);
-        
         wrapperPanel.add(enterBinaryLbl);
         wrapperPanel.add(binaryEntry);
         centerPanel.add(wrapperPanel);
@@ -97,7 +97,10 @@ public class Converter implements ActionListener
     {
         if (e.getSource() == convertBtn)
         {
-            System.out.println("Decimal version of " + binaryEntry.getText() + " is: " + runningTotal);
+            if (toBinary(binaryEntry.getText()))
+                System.out.println("Decimal version of " + binaryEntry.getText() + " is: " + runningTotal);
+            else
+                System.out.println("Error - invalid format for conversion.");
         }
     }
     
@@ -105,41 +108,30 @@ public class Converter implements ActionListener
      * A method to calculate the binary equivalent of the passed string parameter.
      *
      * @param s The string to convert to binary.
+     * @return true if binary conversion was successful.
      */
     private boolean toBinary(String s)
     {
+        runningTotal = 0;
+        
         for (int i = 0; i < s.length(); i++)
         {
-            // for each character, check if binary form
-            if (s.charAt(i) != '0' || s.charAt(i) != '1')
+            // for each character, check if not in binary form
+            if (s.charAt(i) != '0' && s.charAt(i) != '1')
                 return false;
             else
             {
-                // get index and add its power of 2 to running total if 1, otherwise carry on (0)
-                posToCheck = s.length() - i;
-                
-                // check for 1 or 0
-                if (s.charAt(posToCheck) != '0')
+                // retrieve power of 2 (working from left)
+                powerValue = (s.length() - i) - 1;
+                if (s.charAt(i) != '0')
                 {
-                    // you have 1
-                    power = Math.pow(2, i);
-                    runningTotal += power;
-                    
-
+                    // you have 1 at this point, so add to total
+                    runningTotal += (int) (Math.pow(2, powerValue));
                 }
-                
-                
-                
             }
-            
-            
         }
         return true;
     }
-    
-    
-    
-    
     
     /**
      * Main method used to create a new instance of this Converter class.
