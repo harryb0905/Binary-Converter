@@ -25,6 +25,10 @@ public class Converter implements ActionListener
     
     private static final Font binaryFont = new Font("Courier New", Font.BOLD, 30);
     
+    private int posToCheck = 0;
+    private double power = 0;
+    private int runningTotal = 0;
+    
     // constants
     private static final int SCREEN_WIDTH = 400;
     private static final int SCREEN_HEIGHT = 500;
@@ -87,15 +91,55 @@ public class Converter implements ActionListener
     /**
      * Detects if a button on the UI has been pressed.
      *
-     * @param e the action event instance.
+     * @param e The action event instance.
      */
     public void actionPerformed(ActionEvent e)
     {
         if (e.getSource() == convertBtn)
         {
-            System.out.println(binaryEntry.getText());
+            System.out.println("Decimal version of " + binaryEntry.getText() + " is: " + runningTotal);
         }
     }
+    
+    /**
+     * A method to calculate the binary equivalent of the passed string parameter.
+     *
+     * @param s The string to convert to binary.
+     */
+    private boolean toBinary(String s)
+    {
+        for (int i = 0; i < s.length(); i++)
+        {
+            // for each character, check if binary form
+            if (s.charAt(i) != '0' || s.charAt(i) != '1')
+                return false;
+            else
+            {
+                // get index and add its power of 2 to running total if 1, otherwise carry on (0)
+                posToCheck = s.length() - i;
+                
+                // check for 1 or 0
+                if (s.charAt(posToCheck) != '0')
+                {
+                    // you have 1
+                    power = Math.pow(2, i);
+                    runningTotal += power;
+                    
+
+                }
+                
+                
+                
+            }
+            
+            
+        }
+        return true;
+    }
+    
+    
+    
+    
     
     /**
      * Main method used to create a new instance of this Converter class.
