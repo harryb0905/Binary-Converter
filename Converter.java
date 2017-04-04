@@ -4,9 +4,9 @@ import java.awt.event.*;
 
 /**
  * A class to allow simple binary conversions to various representations such as denary, octal, hexadecimal and IEEE 754 standard.
- * To use in command line: > java Converter
+ * To use in command line: $ java Converter
  *
- * @author Yash Sandu & Harry Baines
+ * @author Yash Sandu + Harry Baines
  */
 public class Converter implements ActionListener
 {
@@ -22,6 +22,8 @@ public class Converter implements ActionListener
     private JLabel enterBinaryLbl;
     private JLabel resultBinaryLbl;
     private JLabel decimalResultLbl;
+    private JLabel hexResultLbl;
+    private JLabel hexTextLbl;
     private JTextField binaryEntry;
     private JButton convertBtn;
     
@@ -30,11 +32,17 @@ public class Converter implements ActionListener
     // variables
     private int powerValue = 0;
     private int runningTotal = 0;
+    private int counter = 0;
+
     private String resultStr = "";
+    private String currentHex = "";
+    private String finalHex = "";
+    
+    private char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
     
     // constants
     private static final int SCREEN_WIDTH = 400;
-    private static final int SCREEN_HEIGHT = 300;
+    private static final int SCREEN_HEIGHT = 450;
 
     /**
      * Simple constructor to set initial values.
@@ -56,7 +64,8 @@ public class Converter implements ActionListener
         mainPanel.add("North", topPanel);
         mainPanel.add("Center", centerPanel);
         mainPanel.add("South", actionPanel);
-        
+        centerPanel.add(wrapperPanel, BorderLayout.WEST);
+
         // create components to display
         titleLbl = new JLabel("Binary Converter");
         convertBtn = new JButton("Convert");
@@ -64,6 +73,8 @@ public class Converter implements ActionListener
         enterBinaryLbl = new JLabel("Enter Binary:");
         resultBinaryLbl = new JLabel("In Decimal:");
         decimalResultLbl = new JLabel("");
+        hexResultLbl = new JLabel("In Hexadecimal:");
+        hexTextLbl = new JLabel("");
 
         // entry field
         binaryEntry = new JTextField();
@@ -82,8 +93,8 @@ public class Converter implements ActionListener
         topPanel.add(titleLbl);
         actionPanel.add(convertBtn);
         
-        centerPanel.add(wrapperPanel, BorderLayout.WEST);
-        
+        // custom constraints for components
+        c.insets = new Insets(20,20,0,0);
         c.gridx = 0;
         c.gridy = 0;
         wrapperPanel.add(enterBinaryLbl, c);
@@ -95,13 +106,21 @@ public class Converter implements ActionListener
         
         c.gridx = 0;
         c.gridy = 1;
-        c.insets = new Insets(20,0,0,0);
         wrapperPanel.add(resultBinaryLbl, c);
         
         c.gridx = 1;
         c.gridy = 1;
         wrapperPanel.add(decimalResultLbl, c);
-
+        
+        c.gridx = 0;
+        c.gridy = 2;;
+        wrapperPanel.add(hexResultLbl, c);
+        
+        c.gridx = 1;
+        c.gridy = 2;;
+        wrapperPanel.add(hexTextLbl, c);
+        
+        // further window details
         window.setContentPane(mainPanel);
         window.setTitle("Binary Converter");
         window.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -123,10 +142,11 @@ public class Converter implements ActionListener
             if (toBinary(binaryEntry.getText()))
             {
                 decimalResultLbl.setText(Integer.toString(runningTotal));
-                System.out.println("Decimal version of " + binaryEntry.getText() + " is: " + runningTotal);
+                hexTextLbl.setText(toHex(binaryEntry.getText()));
+                
             }
             else
-                System.out.println("Error - invalid format for conversion.");
+                decimalResultLbl.setText("Invalid Input");
         }
     }
     
@@ -160,6 +180,38 @@ public class Converter implements ActionListener
             }
         }
         return true;
+    }
+    
+    /**
+     * A method to calculate the hexadecimal equivalent of the passed binary string.
+     *
+     * @param s The binary string to convert to hexadecimal.
+     * @return The hexadecimal string.
+     */
+    private String toHex(String s)
+    {
+        currentHex = "";
+        
+        while (counter < s.length())
+        {
+            runningTotal = 0;
+            while (powerValue <= 3)
+            {
+                if (s.charAt(s.length() - counter - 1) == '1')
+                {
+                    // retrieve power of 2 (working from right)
+                    runningTotal += (int) (Math.pow(2, powerValue));
+                }
+                powerValue++;
+                counter++;
+            }
+            powerValue = 0;
+            currentHex += hexArray[runningTotal];
+        }
+        
+        // reverse the string
+        finalHex = "0x" + new StringBuilder(currentHex).reverse().toString();
+        return (finalHex);
     }
     
     /**
