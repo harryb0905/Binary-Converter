@@ -20,31 +20,36 @@ public class Converter implements ActionListener
     
     private JLabel titleLbl;
     private JLabel enterBinaryLbl;
+    private JLabel resultBinaryLbl;
+    private JLabel decimalResultLbl;
     private JTextField binaryEntry;
     private JButton convertBtn;
     
-    private static final Font binaryFont = new Font("Courier New", Font.BOLD, 30);
+    private static final Font binaryFont = new Font("Courier New", Font.BOLD, 22);
     
     // variables
     private int powerValue = 0;
     private int runningTotal = 0;
+    private String resultStr = "";
     
     // constants
     private static final int SCREEN_WIDTH = 400;
-    private static final int SCREEN_HEIGHT = 500;
+    private static final int SCREEN_HEIGHT = 300;
 
     /**
      * Simple constructor to set initial values.
      */
     public Converter()
     {
-        // create windows and panels
+        // create window, panels and layouts
         window = new JFrame();
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         topPanel = new JPanel();
-        centerPanel = new JPanel(new GridLayout(3,5));
-        wrapperPanel = new JPanel(new FlowLayout(10,0,FlowLayout.LEADING));
+        centerPanel = new JPanel(new BorderLayout());
+        
+        wrapperPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         actionPanel = new JPanel();
         
         // add sub-panels to main panel
@@ -57,10 +62,12 @@ public class Converter implements ActionListener
         convertBtn = new JButton("Convert");
         convertBtn.addActionListener(this);
         enterBinaryLbl = new JLabel("Enter Binary:");
+        resultBinaryLbl = new JLabel("In Decimal:");
+        decimalResultLbl = new JLabel("");
 
         // entry field
         binaryEntry = new JTextField();
-        binaryEntry.setPreferredSize(new Dimension(170,50));
+        binaryEntry.setPreferredSize(new Dimension(120,30));
         binaryEntry.setFont(binaryFont);
         binaryEntry.addKeyListener(new KeyAdapter()
         {
@@ -74,11 +81,27 @@ public class Converter implements ActionListener
         // add components to panels
         topPanel.add(titleLbl);
         actionPanel.add(convertBtn);
-        wrapperPanel.add(enterBinaryLbl);
-        wrapperPanel.add(binaryEntry);
-        centerPanel.add(wrapperPanel);
         
-        // further window details
+        centerPanel.add(wrapperPanel, BorderLayout.WEST);
+        
+        c.gridx = 0;
+        c.gridy = 0;
+        wrapperPanel.add(enterBinaryLbl, c);
+        
+        c.gridx = 1;
+        c.gridy = 0;
+        c.ipady = 20;
+        wrapperPanel.add(binaryEntry, c);
+        
+        c.gridx = 0;
+        c.gridy = 1;
+        c.insets = new Insets(20,0,0,0);
+        wrapperPanel.add(resultBinaryLbl, c);
+        
+        c.gridx = 1;
+        c.gridy = 1;
+        wrapperPanel.add(decimalResultLbl, c);
+
         window.setContentPane(mainPanel);
         window.setTitle("Binary Converter");
         window.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -98,7 +121,10 @@ public class Converter implements ActionListener
         if (e.getSource() == convertBtn)
         {
             if (toBinary(binaryEntry.getText()))
+            {
+                decimalResultLbl.setText(Integer.toString(runningTotal));
                 System.out.println("Decimal version of " + binaryEntry.getText() + " is: " + runningTotal);
+            }
             else
                 System.out.println("Error - invalid format for conversion.");
         }
@@ -114,9 +140,12 @@ public class Converter implements ActionListener
     {
         runningTotal = 0;
         
+        if (s.equals(""))
+            return false;
+        
         for (int i = 0; i < s.length(); i++)
         {
-            // for each character, check if not in binary form
+            // for each character, do a validation check
             if (s.charAt(i) != '0' && s.charAt(i) != '1')
                 return false;
             else
