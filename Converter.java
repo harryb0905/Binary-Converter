@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.NumberFormat;
 
 /**
  * A class to allow simple binary conversions to various representations such as denary, octal, hexadecimal and IEEE 754 standard.
@@ -78,13 +79,13 @@ public class Converter implements ActionListener
 
         // entry field
         binaryEntry = new JTextField();
-        binaryEntry.setPreferredSize(new Dimension(120,30));
+        binaryEntry.setPreferredSize(new Dimension(180,30));
         binaryEntry.setFont(binaryFont);
         binaryEntry.addKeyListener(new KeyAdapter()
         {
             public void keyTyped(KeyEvent e)
             {
-                if (binaryEntry.getText().length() >= 8) // limit textfield to 8 characters
+                if (binaryEntry.getText().length() > 31) // limit textfield to 8 characters
                     e.consume();
             }  
         });
@@ -139,14 +140,17 @@ public class Converter implements ActionListener
     {
         if (e.getSource() == convertBtn)
         {
-            if (toBinary(binaryEntry.getText()))
+            String text = binaryEntry.getText();
+            if (toBinary(text))
             {
-                decimalResultLbl.setText(Integer.toString(runningTotal));
-                hexTextLbl.setText(toHex(binaryEntry.getText()));
-                
+                decimalResultLbl.setText(NumberFormat.getIntegerInstance().format(runningTotal));
+                hexTextLbl.setText(toHex(text));
             }
             else
+            {
                 decimalResultLbl.setText("Invalid Input");
+                hexTextLbl.setText("");
+            }
         }
     }
     
@@ -197,7 +201,8 @@ public class Converter implements ActionListener
             runningTotal = 0;
             while (powerValue <= 3)
             {
-                if (s.charAt(s.length() - counter - 1) == '1')
+                int ind = s.length() - counter - 1;
+                if (ind >= 0 && s.charAt(ind) == '1')
                 {
                     // retrieve power of 2 (working from right)
                     runningTotal += (int) (Math.pow(2, powerValue));
@@ -211,9 +216,12 @@ public class Converter implements ActionListener
         
         // reverse the string
         finalHex = "0x" + new StringBuilder(currentHex).reverse().toString();
+        counter = 0;
         return (finalHex);
     }
-    
+
+    // private String hexColTo
+
     /**
      * Main method used to create a new instance of this Converter class.
      * 
